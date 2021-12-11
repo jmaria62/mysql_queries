@@ -2,7 +2,7 @@ use universidad;
 
 /*
 1.- Retorna un llistat amb el primer cognom, segon cognom i el nom de tots els alumnes. El llistat haurà d'estar ordenat alfabèticament de menor a major pel primer cognom, segon cognom i nom.
-select apellido1,apellido2,nombre from persona where tipo="alumno" ;
+select apellido1,apellido2,nombre from persona where tipo="alumno" order by apellido1,apellido2,nombre;
 
 2.-Esbrina el nom i els dos cognoms dels alumnes que no han donat d'alta el seu número de telèfon en la base de dades.
 select nombre,apellido1,apellido2,telefono from persona where tipo="alumno" and telefono is null;
@@ -22,20 +22,19 @@ select * from asignatura where cuatrimestre=1 and curso=3 and id_grado=7;
 select persona.apellido1,persona.apellido2,persona.nombre,departamento.nombre from persona inner join profesor inner join departamento on persona.id = profesor.id_profesor and profesor.id_departamento = departamento.id order by apellido1,apellido2,persona.nombre;
 
 7.- Retorna un llistat amb el nom de les assignatures, any d'inici i any de fi del curs escolar de l'alumne amb nif 26902806M.
-select asignatura.nombre,curso_escolar.anyo_inicio,curso_escolar.anyo_fin from persona inner join alumno_se_matricula_asignatura inner join asignatura inner join curso_escolar on persona.id = alumno_se_matricula_asignatura.id_alumno and alumno_se_matricula_asignatura.id_asignatura=asignatura.id where persona.nif="26902806M"
-
+select asignatura.nombre,curso_escolar.anyo_inicio,curso_escolar.anyo_fin from persona inner join alumno_se_matricula_asignatura inner join asignatura inner join curso_escolar on persona.id = alumno_se_matricula_asignatura.id_alumno and alumno_se_matricula_asignatura.id_asignatura=asignatura.id and alumno_se_matricula_asignatura.id_curso_escolar = curso_escolar.id  where persona.nif="26902806M"
 
 8.- Retorna un llistat amb el nom de tots els departaments que tenen professors que imparteixen alguna assignatura en el Grau en Enginyeria Informàtica (Pla 2015).
 
-select departamento.nombre from departamento inner join profesor inner join asignatura on departamento.id = profesor.id_departamento and asignatura.id_profesor=;
---------------------------------------
+select distinct departamento.nombre from departamento inner join profesor inner join asignatura inner join grado on departamento.id = profesor.id_departamento
+and asignatura.id_profesor = profesor.id_profesor and asignatura.id_grado=grado.id  where grado.nombre="Grado en Ingeniería Informática (Plan 2015)";
 
-Resolgui les 6 següents consultes utilitzant les clàusules LEFT JOIN i RIGHT JOIN.
+
+ Resolgui les 6 següents consultes utilitzant les clàusules LEFT JOIN i RIGHT JOIN.
 
 1.-     Retorna un llistat amb els noms de tots els professors i els departaments que tenen vinculats. El llistat també ha de mostrar aquells professors que no tenen cap departament associat. El llistat ha de retornar quatre columnes, nom del departament, primer cognom, segon cognom i nom del professor. El resultat estarà ordenat alfabèticament de menor a major pel nom del departament, cognoms i el nom.
+select departamento.nombre,persona.nombre,persona.apellido1,persona.apellido2 from  departamento right join profesor on departamento.id=profesor.id_profesor inner join persona on persona.id=profesor.id_profesor where persona.tipo="profesor" order by departamento.nombre,persona.apellido1,persona.apellido2,persona.nombre;
 
-select departamento.nombre,persona.nombre,persona.apellido1,persona.apellido2 from persona left join profesor  on persona.id=profesor.id_profesor inner join departamento on profesor.id_departamento=departamento.id where persona.tipo="profesor" order by departamento.nombre,persona.apellido1,persona.apellido2,persona.nombre;
-where persona.tipo="profesor"
 
 2.- Retorna un llistat amb els professors que no estan associats a un departament.
 
@@ -64,10 +63,10 @@ select count(id) from persona where tipo="alumno" and year(fecha_nacimiento)=199
 select count(id_profesor) as num_profesores,departamento.nombre from profesor join departamento on profesor.id_departamento=departamento.id group by profesor.id_departamento order by num_profesores desc,nombre;
 
 4.- Retorna un llistat amb tots els departaments i el nombre de professors que hi ha en cadascun d'ells. Tingui en compte que poden existir departaments que no tenen professors associats. Aquests departaments també han d'aparèixer en el llistat.
-select departamento.nombre,count(id_profesor) as num_profesores from departamento left join profesor on profesor.id_departamento=departamento.id group by profesor.id_departamento order by num_profesores desc,nombre;
+select departamento.nombre,count(id_profesor) as num_profesores from departamento left join profesor on profesor.id_departamento=departamento.id group by departamento.id order by num_profesores desc,nombre;
 
 5.- Retorna un llistat amb el nom de tots els graus existents en la base de dades i el nombre d'assignatures que té cadascun. Tingui en compte que poden existir graus que no tenen assignatures associades. Aquests graus també han d'aparèixer en el llistat. El resultat haurà d'estar ordenat de major a menor pel nombre d'assignatures.
-select grado.nombre,count(asignatura.id) as num_asignaturas from grado left join asignatura on grado.id=asignatura.id_grado group by id_grado order by num_asignaturas desc;
+select grado.nombre,count(asignatura.id) as num_asignaturas from grado left join asignatura on grado.id=asignatura.id_grado group by grado.id order by num_asignaturas desc;
 
 6.- Retorna un llistat amb el nom de tots els graus existents en la base de dades i el nombre d'assignatures que té cadascun, dels graus que tinguin més de 40 assignatures associades.
 select grado.nombre,count(asignatura.id) as num_asignaturas from grado left join asignatura on grado.id=asignatura.id_grado  group by id_grado having num_asignaturas>40;
@@ -76,7 +75,7 @@ select grado.nombre,count(asignatura.id) as num_asignaturas from grado left join
 select grado.nombre,asignatura.tipo,sum(asignatura.creditos) as creditos from asignatura inner join grado on asignatura.id_grado=grado.id group by asignatura.id_grado,asignatura.tipo
 
 8.- Retorna un llistat que mostri quants alumnes s'han matriculat d'alguna assignatura en cadascun dels cursos escolars. El resultat haurà de mostrar dues columnes, una columna amb l'any d'inici del curs escolar i una altra amb el nombre d'alumnes matriculats.
-select curso_escolar.anyo_inicio,count(id_alumno) as num_alumnes from alumno_se_matricula_asignatura join curso_escolar on id_curso_escolar=curso_escolar.id group by id_curso_escolar;
+select curso_escolar.anyo_inicio,count(distinct id_alumno) as num_alumnes from alumno_se_matricula_asignatura join curso_escolar on id_curso_escolar=curso_escolar.id group by id_curso_escolar;
 
 9.- Retorna un llistat amb el nombre d'assignatures que imparteix cada professor. El llistat ha de tenir en compte aquells professors que no imparteixen cap assignatura. El resultat mostrarà cinc columnes: id, nom, primer cognom, segon cognom i nombre d'assignatures. El resultat estarà ordenat de major a menor pel nombre d'assignatures.
 SELECT persona.id,persona.nombre,persona.apellido1,persona.apellido2,count(asignatura.id) as num_asignaturas from persona left join asignatura on persona.id=asignatura.id_profesor where persona.tipo="profesor" group by persona.id order by num_asignaturas desc;

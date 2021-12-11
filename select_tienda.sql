@@ -13,8 +13,12 @@ select upper(nombre),precio from producto;
 Llista els noms i els preus de tots els productos de la taula producto, convertint els noms a minúscula.
 select lower(nombre),precio from producto;
 
-Llista el nom de tots els fabricants en una columna, i en una altra columna obtingui en majúscules els dos primers caràcters del nom del fabricant
-select nombre,concat(upper(left(nombre,2)),right(nombre,length(nombre)-2)) from fabricante;
+8.- Llista el nom de tots els fabricants en una columna, i en una altra columna obtingui en majúscules els dos primers caràcters del nom del fabricant
+
+select nombre,upper(left(nombre,2)) from fabricante;
+
+9.- Llista els noms i els preus de tots els productos de la taula producto, arrodonint el valor del preu
+select nombre,round(precio) from producto;
 
 
 10.- Llista els noms i els preus de tots els productos de la taula producto, truncant el valor del preu per a mostrar-lo sense cap xifra decimal
@@ -41,8 +45,7 @@ select nombre,precio from producto order by nombre asc,precio desc;
 select * from fabricante limit 5;
 
 17.- Retorna una llista amb 2 files a partir de la quarta fila de la taula fabricante. La quarta fila també s'ha d'incloure en la resposta.
-select codigo from fabricante limit 3,2;
-
+select * from fabricante limit 3,2;
 18.- Llista el nom i el preu del producto més barat. (Utilitzi solament les clàusules ORDER BY i LIMIT). NOTA: Aquí no podria usar MIN(preu), necessitaria GROUP BY
 select nombre,precio from producto order by precio limit 1;
 
